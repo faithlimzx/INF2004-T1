@@ -2,7 +2,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
-#define ENCODER_PIN 20  // GPIO pin connected to the wheel encoder //
+#define ENCODER_PIN 2  // GPIO pin connected to the wheel encoder //
 
 // Define the properties of your wheel and encoder
 #define PPR 360       // Example: 360 pulses per wheel revolution
