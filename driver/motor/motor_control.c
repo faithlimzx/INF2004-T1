@@ -13,10 +13,10 @@
 #define motorPWMR 0
 #define motorPWML 1
 
-#define motorDirR01 2
-#define motorDirR02 3
+#define motorDirR01 3
+#define motorDirR02 4
 #define motorDirL01 5
-#define motorDirL02 4
+#define motorDirL02 6
 
 int main() {
     // Initialize standard I/O
@@ -80,17 +80,27 @@ int main() {
         gpio_put(motorDirL01, 0);
         gpio_put(motorDirL02, 1);
 
+        // Wait for a specified duration (4000 milliseconds)
+        sleep_ms(4000);
+
         // Left motor forward, right motor backward (turn left)
-        //gpio_put(motorDirR01, 0);
-        //gpio_put(motorDirR02, 1);
-        //gpio_put(motorDirL01, 1);
-        //gpio_put(motorDirL02, 0);
+        pwm_set_chan_level(slice_num01, PWM_CHAN_A, 12500/2);
+        pwm_set_chan_level(slice_num02, PWM_CHAN_B, 12500/2);
+        gpio_put(motorDirR01, 0);
+        gpio_put(motorDirR02, 1);
+        gpio_put(motorDirL01, 0);
+        gpio_put(motorDirL02, 0);
+
+        // Wait for a specified duration (4000 milliseconds)
+        sleep_ms(4000);
 
         // Left motor backward, right motor forward (turn right)
-        //gpio_put(motorDirR01, 1);
-        //gpio_put(motorDirR02, 0);
-        //gpio_put(motorDirL01, 0);
-        //gpio_put(motorDirL02, 1);
+        pwm_set_chan_level(slice_num01, PWM_CHAN_A, 12500/2);
+        pwm_set_chan_level(slice_num02, PWM_CHAN_B, 12500/2);
+        gpio_put(motorDirR01, 0);
+        gpio_put(motorDirR02, 0);
+        gpio_put(motorDirL01, 1);
+        gpio_put(motorDirL02, 0);
 
         // Wait for a specified duration (2000 milliseconds)
         sleep_ms(2000); 
