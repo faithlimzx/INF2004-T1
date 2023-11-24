@@ -1,16 +1,16 @@
 #include <stdio.h>
-#include "pico/stdlib.h"
+#include "pico/stdlib.h" 
 #include "hardware/gpio.h"
 #include "hardware/pwm.h"
 #include "pico/time.h"
 #include "hardware/irq.h"
 #include "hardware/timer.h"
 
-// Define GPIO pins for Ultrasonic sensor 
+// Define GPIO pins for ULTRASONIC SENSOR  
 #define TRIGGER_PIN 12
 #define ECHO_PIN 13
 
-// Define GPIO pins for PWM signals, motor directions, etc.
+// Define GPIO pins for PWM SIGNALS and MOTOR DIRECTIONS
 #define motorPWMR 0
 #define motorPWML 1
 
@@ -19,33 +19,35 @@
 #define motorDirL01 6
 #define motorDirL02 5
 
-// Define GPIO pins for IR sensors
+// Define GPIO pins for IR SENSORS
 #define IR_SENSOR_LEFT 26
 #define IR_SENSOR_RIGHT 27
 #define IR_SENSOR_BOTTOM 28
 
-// Define GPIO pin for the encoder output
+// Define GPIO pin for ENCODER OUTPUT 
 #define ENCODER_OUT_PIN 2 
 
+// PWM Slices
 uint slice_num01;
 uint slice_num02;
 
-volatile int pulseCount = 0; // Variable to count the encoder pulses
+// Variable to count the ENCODER PULSES 
+volatile int pulseCount = 0; 
 
 float get_distance() 
 {
-    // Triggering the ultrasonic sensor
+    // Triggering the ULTRASONIC SENSOR 
     gpio_put(TRIGGER_PIN, 1);
     sleep_us(10);
     gpio_put(TRIGGER_PIN, 0);
 
-    // Measuring the pulse duration from the echo pin
+    // Measuring the pulse duration from the ECHO PIN
     while (gpio_get(ECHO_PIN) == 0) {}
     uint32_t start_time = time_us_32();
     while (gpio_get(ECHO_PIN) == 1) {}
     uint32_t end_time = time_us_32();
 
-    // Calculate distance in meters
+    // Calculate distance in CM
     float pulse_duration = (float)(end_time - start_time);
     float distance = (pulse_duration / 2) * 0.000343 * 100;
 
@@ -54,62 +56,61 @@ float get_distance()
 
 void gpio_ultrasonic_initialization() 
 {
+    // Initialize GPIO pins for ULTRASONIC SENSOR 
     gpio_init(TRIGGER_PIN);
     gpio_init(ECHO_PIN);
 
+    // Set GPIO pins to output(trigger) and input(echo) for ULTRASONIC SENSOR 
     gpio_set_dir(TRIGGER_PIN, GPIO_OUT);
     gpio_set_dir(ECHO_PIN, GPIO_IN);
 
+    // Set the ULTRASONIC SENSOR to logic low 
     gpio_put(TRIGGER_PIN, 0);
 
-    sleep_ms(500);  // Allow the sensor to settle
+    sleep_ms(500);  // Allow the ULTRASONIC SENSOR to settle
 }
 
 void encoder_pulse_handler() 
 {
-    // Increment pulse count on each edge transition (e.g., rising or falling edge)
+    // Increment pulse count on each edge transition 
     pulseCount++;
 }
 
 void setup_encoder_interrupt() 
 {
+    // Configuring interrupt on the GPIO pin ENCODER_OUT_PIN to trigger when a falling edge is detected
     gpio_set_irq_enabled_with_callback(ENCODER_OUT_PIN, GPIO_IRQ_EDGE_FALL, true, &encoder_pulse_handler);
-    // irq_set_exclusive_handler(GPIO_IRQ_0, encoder_pulse_handler);
-    // irq_set_enabled(ENCODER_OUT_PIN, true);
 }
 
-// Configure GPIO pin for the encoder output
 void gpio_encoder_initialization()
 {
-    // Initialize GPIO pins for encoder
+    // Initialize GPIO pins for ENCODER 
     gpio_init(ENCODER_OUT_PIN);
 
-    // Set GPIO directions to input
+    // Set GPIO directions to input for ENCODER 
     gpio_set_dir(ENCODER_OUT_PIN, GPIO_IN);
 }
    
 void gpio_ir_sensor_initialization()
 {
-    // Initialize GPIO pins for IR sensors
+    // Initialize GPIO pins for IR SENSORS
     gpio_init(IR_SENSOR_LEFT);
     gpio_init(IR_SENSOR_RIGHT);
 
-    // Set GPIO directions to input
+    // Set GPIO directions to input for IR SENSORS
     gpio_set_dir(IR_SENSOR_LEFT, GPIO_IN);
     gpio_set_dir(IR_SENSOR_RIGHT, GPIO_IN);
 }
 
-// Function to initialize motor control
 void gpio_motor_initialization()
 {
-
-    // GPIO initialization
+    // GPIO initialization for MOTOR CONTROL
     gpio_init(motorDirR01);
     gpio_init(motorDirR02);
     gpio_init(motorDirL01);
     gpio_init(motorDirL02);
 
-    // Set GPIO directions to output
+    // Set GPIO directions to output for MOTOR CONTROL
     gpio_set_dir(motorDirR01, GPIO_OUT);
     gpio_set_dir(motorDirR02, GPIO_OUT);
     gpio_set_dir(motorDirL01, GPIO_OUT);
@@ -119,6 +120,7 @@ void gpio_motor_initialization()
     gpio_set_function(motorPWMR, GPIO_FUNC_PWM);
     gpio_set_function(motorPWML, GPIO_FUNC_PWM);
 
+    // Assigning variables for PWM slices 
     slice_num01 = pwm_gpio_to_slice_num(motorPWMR);
     slice_num02 = pwm_gpio_to_slice_num(motorPWML);
 
@@ -133,7 +135,7 @@ void gpio_motor_initialization()
     pwm_set_enabled(slice_num02, true);
 }
 
-// Function to print statements when IR sensors detect a black line
+// Function to print statements when IR SENSORS detect a black line
 void printIRSensorStatus()
 {
     if (gpio_get(IR_SENSOR_LEFT))
@@ -155,6 +157,7 @@ void printIRSensorStatus()
     }
 }
 
+// Function to STOP the robot car 
 void move_stop()
 {
     pwm_set_chan_level(slice_num01, PWM_CHAN_A, 0);
@@ -165,6 +168,7 @@ void move_stop()
     gpio_put(motorDirL02, 0);
 }
 
+// Function to drive the robot car FORWARDS
 void move_forward()
 {
     pwm_set_chan_level(slice_num01, PWM_CHAN_A, 12500 / 1.5);
@@ -175,6 +179,7 @@ void move_forward()
     gpio_put(motorDirL02, 0);
 }
 
+// Function to drive the robot car BACKWARDS 
 void move_backward()
 {
     pwm_set_chan_level(slice_num01, PWM_CHAN_A, 12500 / 1.5);
@@ -185,6 +190,7 @@ void move_backward()
     gpio_put(motorDirL02, 1);
 }
 
+// Function to turn the robot car RIGHT
 void move_forward_right()
 {
     pwm_set_chan_level(slice_num01, PWM_CHAN_A, 0);
@@ -195,6 +201,7 @@ void move_forward_right()
     gpio_put(motorDirL02, 0);
 }
 
+// Function to turn the robot car LEFT
 void move_forward_left()
 {
     pwm_set_chan_level(slice_num01, PWM_CHAN_A, 12500 / 1.5);
@@ -203,16 +210,6 @@ void move_forward_left()
     gpio_put(motorDirR02, 0);
     gpio_put(motorDirL01, 1);
     gpio_put(motorDirL02, 0);
-}
-
-void move_backward_right()
-{
-    pwm_set_chan_level(slice_num01, PWM_CHAN_A, 0);
-    pwm_set_chan_level(slice_num02, PWM_CHAN_B, 12500 / 1);
-    gpio_put(motorDirR01, 0);
-    gpio_put(motorDirR02, 1);
-    gpio_put(motorDirL01, 0);
-    gpio_put(motorDirL02, 1);
 }
 
 int main()
@@ -232,22 +229,22 @@ int main()
     while (1)
     {
         // Print statements for encoder
-        // printf("Pulse Count: %d\n", pulseCount);
+        printf("Pulse Count: %d\n", pulseCount);
 
         // Print statements for IR sensors
-        // printIRSensorStatus();
+        printIRSensorStatus();
 
-        // Print statements for Ultrasonic sensor 
+        // Print statements for ULTRASONIC SENSOR
         float distance = get_distance();
         printf("Distance: %.2f cm\n", distance);
 
-        // Set a threshold distance to stop and reverse for Ultrasonic sensor 
-        float threshold_distance = 10;  // Adjust this value based on your needs
+        // Set ULTRASONIC SENSOR threshold distance to REVERSE robot car  
+        float threshold_distance = 10;  
 
         // Robot logic 
         if (distance < threshold_distance) 
         {
-            // Ultrasonic threshold reached: reverse for 1.2 seconds
+            // ULTRASONIC SENSOR threshold reached: REVERSE robot car for 1.2 seconds
             move_backward(); 
             sleep_ms(1200);   
             move_stop(); 
@@ -255,47 +252,28 @@ int main()
 
         else if (!gpio_get(IR_SENSOR_LEFT) && !gpio_get(IR_SENSOR_RIGHT))
         {
-            // Neither sensor on the line: travel straight
+            // Neither IR SENSOR on the line: robot car moves FORWARDS
             move_forward();
         }
         else if (!gpio_get(IR_SENSOR_LEFT) && gpio_get(IR_SENSOR_RIGHT))
         {
-            // Right sensor on the line: turn left
+            // Right IR SENSOR on the line: robot car turns LEFT
             move_forward_left(); 
             sleep_ms(400);
         }
         else if (gpio_get(IR_SENSOR_LEFT) && !gpio_get(IR_SENSOR_RIGHT))
         {
-            // Left sensor on the line: turn right
+            // Left IR SENSOR on the line: robot car turns RIGHT
             move_forward_right(); 
             sleep_ms(400);
         }
         else if (gpio_get(IR_SENSOR_LEFT) && gpio_get(IR_SENSOR_RIGHT))
         {
-            // Both sensors on the black line: reverse for 1.2 second
+            // Both IR SENSORS on the line: robot car moves BACKWARDS for 1.2 seconds
             move_stop();
             move_backward(); 
             sleep_ms(1200);   
             move_stop();    
-
-            // Sweep motion to detect black lines after reversing
-            // for (int i = 0; i < 1; ++i)
-            // {
-            //     // Perform a sweeping motion
-            //     // For example, you can implement a left-to-right sweeping motion here
-            //     move_forward_left(); // Example: Turn left while moving forward
-            //     sleep_ms(200);       // Adjust the duration as needed for the sweep
-            //     move_forward_right();
-            //     sleep_ms(200);
-            //     move_stop(); // Stop the movement briefly before next step
-
-            //     // Check the line-following logic conditions
-            //     if (gpio_get(IR_SENSOR_LEFT) || gpio_get(IR_SENSOR_RIGHT))
-            //     {
-            //         // If the line is detected while sweeping, break the loop
-            //         break;
-            //     }
-            // }
         }
     }
 
