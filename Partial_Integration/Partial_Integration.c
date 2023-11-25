@@ -249,6 +249,7 @@ int main()
             // ULTRASONIC SENSOR threshold reached: REVERSE robot car for 1.2 seconds
             move_backward(); 
             sleep_ms(1200);    
+            move_stop();
         }
 
         else if (!gpio_get(IR_SENSOR_LEFT) && !gpio_get(IR_SENSOR_RIGHT))
@@ -271,10 +272,8 @@ int main()
         else if (gpio_get(IR_SENSOR_LEFT) && gpio_get(IR_SENSOR_RIGHT))
         {
             // Both IR SENSORS on the line: robot car moves BACKWARDS for 1.2 seconds
-            move_stop();
             move_backward(); 
-            sleep_ms(1200);   
-            move_stop();    
+            sleep_ms(1200);      
         }
     }
 
