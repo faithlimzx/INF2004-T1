@@ -96,10 +96,12 @@ void gpio_ir_sensor_initialization()
     // Initialize GPIO pins for IR SENSORS
     gpio_init(IR_SENSOR_LEFT);
     gpio_init(IR_SENSOR_RIGHT);
+    gpio_init(IR_SENSOR_BOTTOM);
 
     // Set GPIO directions to input for IR SENSORS
     gpio_set_dir(IR_SENSOR_LEFT, GPIO_IN);
     gpio_set_dir(IR_SENSOR_RIGHT, GPIO_IN);
+    gpio_set_dir(IR_SENSOR_BOTTOM, GPIO_IN);
 }
 
 void gpio_motor_initialization()
